@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тамагочи - Выбери питомца</title>
+    <title>Тамагочи - Живой питомец</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,37 +14,40 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
             min-height: 100vh;
             padding: 20px;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 10px;
             color: #6ee7b7;
+            text-shadow: 0 2px 10px rgba(110, 231, 183, 0.3);
         }
         
         .game-area {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 20px;
             padding: 25px;
             margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* Экран выбора питомца */
+        /* Экран выбора */
         .pet-selection {
             text-align: center;
         }
@@ -57,13 +60,13 @@
         
         .pets-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
             margin-bottom: 40px;
         }
         
         .pet-option {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 15px;
             padding: 20px;
             cursor: pointer;
@@ -73,13 +76,13 @@
         
         .pet-option:hover {
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.12);
             border-color: #6ee7b7;
         }
         
         .pet-option.selected {
             border-color: #fbbf24;
-            background: rgba(251, 191, 36, 0.1);
+            background: rgba(251, 191, 36, 0.15);
         }
         
         .pet-icon {
@@ -90,7 +93,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5rem;
+            font-size: 4rem;
+            transition: transform 0.3s;
+        }
+        
+        .pet-option:hover .pet-icon {
+            transform: scale(1.1);
         }
         
         .pet-name {
@@ -103,33 +111,35 @@
             font-size: 0.9rem;
             color: #cbd5e1;
             margin-bottom: 15px;
+            min-height: 40px;
         }
         
         .start-button {
             background: linear-gradient(135deg, #10b981, #34d399);
             color: white;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
+            padding: 16px 45px;
+            font-size: 1.3rem;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: bold;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
         }
         
         .start-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
         }
         
         .start-button:disabled {
-            background: #6b7280;
+            background: #475569;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
         
-        /* Игровой экран (скрыт по умолчанию) */
+        /* Игровой экран */
         .game-screen {
             display: none;
         }
@@ -144,68 +154,210 @@
         }
         
         .back-button {
-            background: #6b7280;
+            background: #475569;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            transition: all 0.3s;
         }
         
-        .pet-display {
-            text-align: center;
+        .back-button:hover {
+            background: #64748b;
+            transform: translateX(-3px);
+        }
+        
+        .pet-info-bar {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            color: #fbbf24;
+            font-size: 1.1rem;
+        }
+        
+        /* Игровая сцена */
+        .game-scene {
+            display: flex;
+            gap: 30px;
             margin-bottom: 30px;
+            min-height: 350px;
         }
         
-        .current-pet {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 20px;
+        .scene-area {
+            flex: 2;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
             position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .controls-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        /* Анимации питомца */
+        .pet-container {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            z-index: 10;
+        }
+        
+        .pet-character {
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
         
         .pet-body {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-        }
-        
-        .pet-eye {
-            width: 30px;
-            height: 30px;
-            background: white;
-            border-radius: 50%;
             position: absolute;
-            top: 40%;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s;
         }
         
-        .left-eye { left: 25%; }
-        .right-eye { right: 25%; }
+        .pet-face {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 2.5rem;
+        }
         
-        .pet-mouth {
+        /* Объекты на сцене */
+        .scene-object {
+            position: absolute;
+            transition: all 0.3s;
+        }
+        
+        .food-bowl {
+            bottom: 30px;
+            left: 100px;
             width: 60px;
             height: 30px;
-            border-bottom: 5px solid black;
-            border-radius: 0 0 50px 50px;
-            position: absolute;
-            bottom: 25%;
-            left: 50%;
-            transform: translateX(-50%);
+            background: #f59e0b;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
         }
         
+        .water-bowl {
+            bottom: 30px;
+            right: 100px;
+            width: 60px;
+            height: 30px;
+            background: #3b82f6;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .toilet {
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+        }
+        
+        .poop {
+            position: absolute;
+            bottom: 40px;
+            font-size: 2rem;
+            z-index: 5;
+            animation: poopAppear 0.5s ease-out;
+        }
+        
+        @keyframes poopAppear {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Анимации */
+        .walking {
+            animation: walk 1s infinite alternate;
+        }
+        
+        @keyframes walk {
+            0% { transform: translateX(-50%) translateY(0); }
+            100% { transform: translateX(-50%) translateY(-5px); }
+        }
+        
+        .eating {
+            animation: eat 0.5s infinite;
+        }
+        
+        @keyframes eat {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        .drinking {
+            animation: drink 0.8s infinite;
+        }
+        
+        @keyframes drink {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(-5deg); }
+            75% { transform: translate(-50%, -50%) rotate(5deg); }
+        }
+        
+        .sleeping {
+            animation: sleep 2s infinite;
+        }
+        
+        @keyframes sleep {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .playing {
+            animation: play 0.6s infinite alternate;
+        }
+        
+        @keyframes play {
+            0% { transform: translate(-50%, -50%) rotate(-10deg); }
+            100% { transform: translate(-50%, -50%) rotate(10deg); }
+        }
+        
+        .cleaning {
+            animation: clean 1s infinite;
+        }
+        
+        @keyframes clean {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+        
+        /* Полоски показателей */
         .stats {
             display: grid;
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .stat {
             background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
         }
         
@@ -213,18 +365,19 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 8px;
+            font-size: 0.9rem;
         }
         
         .bar-container {
-            height: 20px;
+            height: 16px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
         }
         
         .bar {
             height: 100%;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: width 0.5s;
         }
         
@@ -232,91 +385,113 @@
         .happiness-bar { background: #fbbf24; }
         .energy-bar { background: #3b82f6; }
         .health-bar { background: #10b981; }
+        .hygiene-bar { background: #8b5cf6; }
         
-        .controls {
+        /* Кнопки управления */
+        .controls-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
         
-        button {
-            background: #6366f1;
+        .action-btn {
+            background: #4f46e5;
             color: white;
             border: none;
-            padding: 15px 10px;
+            padding: 12px 8px;
             border-radius: 10px;
-            font-size: 0.9rem;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 5px;
             transition: all 0.2s;
+            font-size: 0.85rem;
         }
         
-        button:hover {
-            background: #4f46e5;
+        .action-btn:hover {
+            background: #4338ca;
             transform: translateY(-2px);
         }
         
-        button:disabled {
-            background: #6b7280;
+        .action-btn:disabled {
+            background: #475569;
             cursor: not-allowed;
             transform: none;
         }
         
-        .message {
-            background: rgba(255, 255, 255, 0.1);
+        .action-btn i {
+            font-size: 1.2rem;
+        }
+        
+        /* Сообщения и события */
+        .message-box {
+            background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 10px;
-            text-align: center;
             margin-top: 20px;
             min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
         }
         
-        .pet-info {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            color: #cbd5e1;
-            font-size: 0.9rem;
+        .events-log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.85rem;
         }
         
-        /* Анимации */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .event-item {
+            margin-bottom: 5px;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .pulse {
-            animation: pulse 1.5s infinite;
+        /* Подсказки */
+        .hint {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            z-index: 100;
+            animation: fadeIn 0.3s;
         }
         
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-        
-        .shake {
-            animation: shake 0.5s ease;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* Адаптивность */
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
+            .game-scene {
+                flex-direction: column;
+            }
+            
+            .scene-area {
+                min-height: 300px;
+            }
+        }
+        
+        @media (max-width: 600px) {
             .pets-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .controls {
-                grid-template-columns: repeat(2, 1fr);
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
             }
         }
         
@@ -325,12 +500,14 @@
                 grid-template-columns: 1fr;
             }
             
-            .controls {
-                grid-template-columns: 1fr;
+            .screen-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
             }
             
-            h1 {
-                font-size: 2rem;
+            .pet-info-bar {
+                flex-wrap: wrap;
             }
         }
     </style>
@@ -340,24 +517,24 @@
         <!-- Экран выбора питомца -->
         <div class="pet-selection" id="selection-screen">
             <header>
-                <h1><i class="fas fa-paw"></i> Тамагочи</h1>
-                <p>Выберите своего виртуального питомца</p>
+                <h1><i class="fas fa-paw"></i> Живой Тамагочи</h1>
+                <p>Выберите питомца и заботьтесь о нем!</p>
             </header>
             
             <div class="game-area">
-                <h2 class="selection-title">Кто будет вашим питомцем?</h2>
+                <h2 class="selection-title">Кто будет вашим другом?</h2>
                 
                 <div class="pets-grid" id="pets-container">
                     <!-- Питомцы будут добавлены через JavaScript -->
                 </div>
                 
                 <button class="start-button" id="start-button" disabled>
-                    Начать игру
+                    <i class="fas fa-play-circle"></i> Начать заботу
                 </button>
             </div>
             
-            <footer style="text-align: center; margin-top: 30px; color: #94a3b8;">
-                <p>Выберите питомца и нажмите "Начать игру"</p>
+            <footer style="text-align: center; margin-top: 30px; color: #94a3b8; font-size: 0.9rem;">
+                <p>Каждый питомец имеет уникальные анимации и потребности!</p>
             </footer>
         </div>
         
@@ -366,101 +543,148 @@
             <div class="screen-header">
                 <button class="back-button" id="back-button">
                     <i class="fas fa-arrow-left"></i>
-                    Выбрать другого
+                    Другой питомец
                 </button>
-                <h2 id="game-title">Тамагочи</h2>
-                <div id="pet-type-display"></div>
+                
+                <div class="pet-info-bar">
+                    <div><i class="fas fa-user"></i> <span id="pet-name-display">Питомец</span></div>
+                    <div><i class="fas fa-birthday-cake"></i> Возраст: <span id="pet-age">0</span> дней</div>
+                    <div><i class="fas fa-star"></i> Настроение: <span id="pet-mood">Счастлив</span></div>
+                </div>
             </div>
             
             <div class="game-area">
-                <div class="pet-display">
-                    <div class="current-pet" id="current-pet">
-                        <!-- Питомец будет отрисован через JavaScript -->
+                <div class="game-scene">
+                    <!-- Игровая сцена -->
+                    <div class="scene-area" id="scene-area">
+                        <!-- Питомец -->
+                        <div class="pet-container" id="pet-container">
+                            <div class="pet-character">
+                                <div class="pet-body" id="pet-body"></div>
+                                <div class="pet-face" id="pet-face">🐶</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Объекты на сцене -->
+                        <div class="scene-object food-bowl" id="food-bowl">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        
+                        <div class="scene-object water-bowl" id="water-bowl">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        
+                        <div class="scene-object toilet" id="toilet">
+                            <i class="fas fa-toilet"></i>
+                        </div>
+                        
+                        <!-- Какашки будут добавляться динамически -->
                     </div>
-                    <h2 id="pet-status">Счастливый</h2>
+                    
+                    <!-- Панель управления -->
+                    <div class="controls-panel">
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-info">
+                                    <span><i class="fas fa-utensils"></i> Голод</span>
+                                    <span id="hunger-value">80%</span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar hunger-bar" id="hunger-bar" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat">
+                                <div class="stat-info">
+                                    <span><i class="fas fa-smile"></i> Счастье</span>
+                                    <span id="happiness-value">90%</span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar happiness-bar" id="happiness-bar" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat">
+                                <div class="stat-info">
+                                    <span><i class="fas fa-bolt"></i> Энергия</span>
+                                    <span id="energy-value">75%</span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar energy-bar" id="energy-bar" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat">
+                                <div class="stat-info">
+                                    <span><i class="fas fa-heart"></i> Здоровье</span>
+                                    <span id="health-value">95%</span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar health-bar" id="health-bar" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat">
+                                <div class="stat-info">
+                                    <span><i class="fas fa-shower"></i> Чистота</span>
+                                    <span id="hygiene-value">100%</span>
+                                </div>
+                                <div class="bar-container">
+                                    <div class="bar hygiene-bar" id="hygiene-bar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="controls-grid">
+                            <button class="action-btn" id="feed-btn">
+                                <i class="fas fa-apple-alt"></i>
+                                <span>Покормить</span>
+                            </button>
+                            
+                            <button class="action-btn" id="water-btn">
+                                <i class="fas fa-tint"></i>
+                                <span>Напоить</span>
+                            </button>
+                            
+                            <button class="action-btn" id="play-btn">
+                                <i class="fas fa-gamepad"></i>
+                                <span>Поиграть</span>
+                            </button>
+                            
+                            <button class="action-btn" id="sleep-btn">
+                                <i class="fas fa-bed"></i>
+                                <span>Спать</span>
+                            </button>
+                            
+                            <button class="action-btn" id="clean-btn">
+                                <i class="fas fa-shower"></i>
+                                <span>Помыть</span>
+                            </button>
+                            
+                            <button class="action-btn" id="heal-btn">
+                                <i class="fas fa-first-aid"></i>
+                                <span>Лечить</span>
+                            </button>
+                            
+                            <button class="action-btn" id="toilet-btn">
+                                <i class="fas fa-toilet"></i>
+                                <span>В туалет</span>
+                            </button>
+                            
+                            <button class="action-btn" id="clean-poop-btn">
+                                <i class="fas fa-poop"></i>
+                                <span>Убрать</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="pet-info">
-                    <div>Имя: <span id="pet-name-display">Питомец</span></div>
-                    <div>Возраст: <span id="pet-age">0</span> дней</div>
+                <div class="message-box" id="message">
+                    Ваш питомец ждет вашей заботы!
                 </div>
                 
-                <div class="stats">
-                    <div class="stat">
-                        <div class="stat-info">
-                            <span><i class="fas fa-utensils"></i> Голод</span>
-                            <span id="hunger-value">80%</span>
-                        </div>
-                        <div class="bar-container">
-                            <div class="bar hunger-bar" id="hunger-bar" style="width: 80%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="stat">
-                        <div class="stat-info">
-                            <span><i class="fas fa-smile"></i> Счастье</span>
-                            <span id="happiness-value">90%</span>
-                        </div>
-                        <div class="bar-container">
-                            <div class="bar happiness-bar" id="happiness-bar" style="width: 90%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="stat">
-                        <div class="stat-info">
-                            <span><i class="fas fa-bolt"></i> Энергия</span>
-                            <span id="energy-value">75%</span>
-                        </div>
-                        <div class="bar-container">
-                            <div class="bar energy-bar" id="energy-bar" style="width: 75%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="stat">
-                        <div class="stat-info">
-                            <span><i class="fas fa-heart"></i> Здоровье</span>
-                            <span id="health-value">95%</span>
-                        </div>
-                        <div class="bar-container">
-                            <div class="bar health-bar" id="health-bar" style="width: 95%"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="controls">
-                    <button id="feed-btn">
-                        <i class="fas fa-apple-alt"></i>
-                        <span>Покормить</span>
-                    </button>
-                    
-                    <button id="play-btn">
-                        <i class="fas fa-gamepad"></i>
-                        <span>Поиграть</span>
-                    </button>
-                    
-                    <button id="sleep-btn">
-                        <i class="fas fa-bed"></i>
-                        <span>Уложить спать</span>
-                    </button>
-                    
-                    <button id="heal-btn">
-                        <i class="fas fa-first-aid"></i>
-                        <span>Подлечить</span>
-                    </button>
-                    
-                    <button id="clean-btn">
-                        <i class="fas fa-shower"></i>
-                        <span>Помыть</span>
-                    </button>
-                    
-                    <button id="train-btn">
-                        <i class="fas fa-dumbbell"></i>
-                        <span>Тренировать</span>
-                    </button>
-                </div>
-                
-                <div class="message" id="message">
-                    Заботьтесь о своем питомце!
+                <div class="events-log" id="events-log">
+                    <div class="event-item">Добро пожаловать в игру!</div>
                 </div>
             </div>
         </div>
@@ -474,50 +698,62 @@
             {
                 id: 'dog',
                 name: 'Собачка',
-                emoji: '🐕',
+                emoji: '🐶',
                 color: '#f59e0b',
-                description: 'Верный друг, любит играть и требует много внимания',
-                special: 'Быстро восстанавливает энергию во сне'
+                description: 'Активный и верный, любит играть и бегать',
+                special: 'Нуждается в частых прогулках',
+                speed: 1.2,
+                hungerRate: 1.1
             },
             {
                 id: 'cat',
                 name: 'Котик',
                 emoji: '🐱',
                 color: '#6b7280',
-                description: 'Независимый, иногда игнорирует хозяина, но очень милый',
-                special: 'Медленнее теряет счастье'
+                description: 'Независимый и грациозный, любит спать',
+                special: 'Часто умывается сам',
+                speed: 0.8,
+                hungerRate: 0.9
             },
             {
                 id: 'rabbit',
                 name: 'Кролик',
                 emoji: '🐰',
                 color: '#ef4444',
-                description: 'Пушистый и быстрый, любит морковку и прыгать',
-                special: 'Быстрее восстанавливает здоровье'
+                description: 'Пушистый и быстрый, любит прыгать',
+                special: 'Быстро размножает какашки',
+                speed: 1.5,
+                hungerRate: 1.3
             },
             {
-                id: 'dragon',
-                name: 'Дракончик',
-                emoji: '🐲',
-                color: '#10b981',
-                description: 'Магический питомец, может дышать огнем (иногда)',
-                special: 'Медленнее теряет энергию'
+                id: 'hamster',
+                name: 'Хомяк',
+                emoji: '🐹',
+                color: '#fbbf24',
+                description: 'Маленький и шустрый, любит колесо',
+                special: 'Очень быстро бегает',
+                speed: 2.0,
+                hungerRate: 1.2
             },
             {
-                id: 'panda',
-                name: 'Панда',
-                emoji: '🐼',
-                color: '#1f2937',
-                description: 'Милый и ленивый, обожает бамбук и сон',
-                special: 'Быстрее насыщается едой'
+                id: 'fox',
+                name: 'Лисичка',
+                emoji: '🦊',
+                color: '#ea580c',
+                description: 'Хитрая и игривая, любит приключения',
+                special: 'Часто играет сама с собой',
+                speed: 1.3,
+                hungerRate: 1.0
             },
             {
-                id: 'unicorn',
-                name: 'Единорог',
-                emoji: '🦄',
-                color: '#8b5cf6',
-                description: 'Волшебный и грациозный, приносит удачу',
-                special: 'Все показатели снижаются медленнее'
+                id: 'penguin',
+                name: 'Пингвин',
+                emoji: '🐧',
+                color: '#1e293b',
+                description: 'Милая неуклюжая птичка, любит холод',
+                special: 'Медленно ходит, но быстро плавает',
+                speed: 0.7,
+                hungerRate: 1.1
             }
         ];
 
@@ -533,9 +769,20 @@
                 happiness: 90,
                 energy: 75,
                 health: 95,
+                hygiene: 100,
                 age: 0,
-                isSleeping: false
-            }
+                isSleeping: false,
+                isEating: false,
+                isDrinking: false,
+                isPlaying: false,
+                isCleaning: false,
+                isPooping: false,
+                position: 'center',
+                mood: 'happy'
+            },
+            poops: [],
+            lastPoopTime: 0,
+            messages: ['Добро пожаловать в игру!']
         };
 
         // ============================
@@ -546,15 +793,17 @@
         const petsContainer = document.getElementById('pets-container');
         const startButton = document.getElementById('start-button');
         const backButton = document.getElementById('back-button');
-        const currentPetElement = document.getElementById('current-pet');
-        const petNameDisplay = document.getElementById('pet-name-display');
-        const petTypeDisplay = document.getElementById('pet-type-display');
-        const gameTitle = document.getElementById('game-title');
+        const sceneArea = document.getElementById('scene-area');
+        const petContainer = document.getElementById('pet-container');
+        const petBody = document.getElementById('pet-body');
+        const petFace = document.getElementById('pet-face');
+        const messageElement = document.getElementById('message');
+        const eventsLog = document.getElementById('events-log');
 
         // ============================
-        // ФУНКЦИИ ВЫБОРА ПИТОМЦА
+        // ИНИЦИАЛИЗАЦИЯ ВЫБОРА ПИТОМЦА
         // ============================
-        function renderPetSelection() {
+        function initPetSelection() {
             petsContainer.innerHTML = '';
             
             petsData.forEach(pet => {
@@ -564,10 +813,13 @@
                 
                 petElement.innerHTML = `
                     <div class="pet-icon" style="background: ${pet.color}">
-                        <span style="font-size: 3rem;">${pet.emoji}</span>
+                        <span style="font-size: 3.5rem;">${pet.emoji}</span>
                     </div>
                     <div class="pet-name">${pet.name}</div>
                     <div class="pet-description">${pet.description}</div>
+                    <div style="color: #6ee7b7; font-size: 0.8rem; margin-top: 10px;">
+                        <i class="fas fa-running"></i> Скорость: ${pet.speed}x
+                    </div>
                     <div style="color: #fbbf24; font-size: 0.8rem;">
                         <i class="fas fa-star"></i> ${pet.special}
                     </div>
@@ -579,423 +831,630 @@
         }
 
         function selectPet(petId) {
-            // Убираем выделение у всех питомцев
             document.querySelectorAll('.pet-option').forEach(el => {
                 el.classList.remove('selected');
             });
             
-            // Выделяем выбранного питомца
             const selectedElement = document.querySelector(`[data-id="${petId}"]`);
             selectedElement.classList.add('selected');
             
-            // Сохраняем выбор
             gameState.selectedPet = petId;
             startButton.disabled = false;
-            startButton.textContent = `Играть с ${petsData.find(p => p.id === petId).name.toLowerCase()}`;
+            
+            const petData = petsData.find(p => p.id === petId);
+            startButton.innerHTML = `<i class="fas fa-play-circle"></i> Играть с ${petData.name}`;
         }
 
+        // ============================
+        // ЗАПУСК ИГРЫ
+        // ============================
         function startGame() {
             if (!gameState.selectedPet) return;
             
             const petData = petsData.find(p => p.id === gameState.selectedPet);
             
-            // Настраиваем состояние игры
+            // Настройка состояния
             gameState.pet.type = petData.id;
             gameState.pet.name = petData.name;
             
-            // Загружаем сохраненного питомца, если есть
-            loadPet();
+            // Загрузка сохранений
+            loadGame();
             
-            // Обновляем отображение
-            updatePetDisplay();
-            updateStatsDisplay();
+            // Инициализация игры
+            initGameScene();
+            updateGameDisplay();
             
-            // Переключаем экраны
+            // Переключение экранов
             selectionScreen.style.display = 'none';
             gameScreen.style.display = 'block';
             
-            // Устанавливаем заголовок
-            gameTitle.textContent = `Тамагочи: ${petData.name}`;
-            petTypeDisplay.innerHTML = `${petData.emoji} ${petData.name}`;
-            petNameDisplay.textContent = petData.name;
-            
-            showMessage(`Привет! Я ${petData.name.toLowerCase()}! Позаботься обо мне!`);
+            // Добавление сообщения
+            addEvent(`Вы выбрали ${petData.name.toLowerCase()}!`);
+            showMessage(`Привет! Я ${petData.name.toLowerCase()}! Будем дружить!`);
         }
 
-        function updatePetDisplay() {
+        // ============================
+        // ИНИЦИАЛИЗАЦИЯ ИГРОВОЙ СЦЕНЫ
+        // ============================
+        function initGameScene() {
             const petData = petsData.find(p => p.id === gameState.pet.type);
             
-            currentPetElement.innerHTML = `
-                <div class="pet-body" style="background: ${petData.color}">
-                    <div class="pet-eye left-eye"></div>
-                    <div class="pet-eye right-eye"></div>
-                    <div class="pet-mouth"></div>
-                </div>
-            `;
+            // Настройка внешности питомца
+            petBody.style.background = petData.color;
+            petFace.textContent = petData.emoji;
             
-            // Обновляем статус
-            updatePetStatus();
+            // Очистка старых какашек
+            document.querySelectorAll('.poop').forEach(poop => poop.remove());
+            gameState.poops = [];
+            
+            // Начальная анимация
+            petContainer.classList.add('walking');
         }
 
         // ============================
-        // ФУНКЦИИ ИГРЫ
+        // ОБНОВЛЕНИЕ ОТОБРАЖЕНИЯ
         // ============================
-        function updatePetStatus() {
-            const petStatus = document.getElementById('pet-status');
-            const petElement = document.querySelector('.pet-body');
-            
-            // Убираем предыдущие анимации
-            petElement.classList.remove('pulse', 'shake');
-            
-            if (gameState.pet.isSleeping) {
-                petStatus.textContent = 'Спит 💤';
-            } else if (gameState.pet.health < 30) {
-                petStatus.textContent = 'Очень болен 🤒';
-                petElement.classList.add('shake');
-            } else if (gameState.pet.hunger < 30) {
-                petStatus.textContent = 'Очень голоден 🍽️';
-                petElement.classList.add('shake');
-            } else if (gameState.pet.happiness < 30) {
-                petStatus.textContent = 'Очень грустен 😢';
-            } else if (gameState.pet.energy < 30) {
-                petStatus.textContent = 'Очень устал 😴';
-            } else if (gameState.pet.happiness > 80 && gameState.pet.health > 80) {
-                petStatus.textContent = 'Очень счастлив 😄';
-                petElement.classList.add('pulse');
-            } else if (gameState.pet.hunger > 70 && gameState.pet.happiness > 70) {
-                petStatus.textContent = 'Доволен 😊';
-            } else {
-                petStatus.textContent = 'Нормальный 🙂';
-            }
-            
-            // Обновляем рот в зависимости от настроения
-            const petMouth = document.querySelector('.pet-mouth');
-            if (gameState.pet.happiness > 70) {
-                petMouth.style.borderRadius = '0 0 50px 50px';
-                petMouth.style.borderBottom = '5px solid black';
-                petMouth.style.height = '30px';
-            } else if (gameState.pet.happiness > 40) {
-                petMouth.style.borderRadius = '0';
-                petMouth.style.borderBottom = '3px solid black';
-                petMouth.style.height = '20px';
-            } else {
-                petMouth.style.borderRadius = '50px 50px 0 0';
-                petMouth.style.borderBottom = '5px solid black';
-                petMouth.style.borderTop = '5px solid black';
-                petMouth.style.height = '15px';
-            }
-        }
-
-        function updateStatsDisplay() {
-            // Обновляем полоски
+        function updateGameDisplay() {
+            // Показатели
             document.getElementById('hunger-bar').style.width = gameState.pet.hunger + '%';
             document.getElementById('happiness-bar').style.width = gameState.pet.happiness + '%';
             document.getElementById('energy-bar').style.width = gameState.pet.energy + '%';
             document.getElementById('health-bar').style.width = gameState.pet.health + '%';
+            document.getElementById('hygiene-bar').style.width = gameState.pet.hygiene + '%';
             
-            // Обновляем значения
             document.getElementById('hunger-value').textContent = Math.round(gameState.pet.hunger) + '%';
             document.getElementById('happiness-value').textContent = Math.round(gameState.pet.happiness) + '%';
             document.getElementById('energy-value').textContent = Math.round(gameState.pet.energy) + '%';
             document.getElementById('health-value').textContent = Math.round(gameState.pet.health) + '%';
+            document.getElementById('hygiene-value').textContent = Math.round(gameState.pet.hygiene) + '%';
             
-            // Обновляем возраст
+            // Информация о питомце
+            document.getElementById('pet-name-display').textContent = gameState.pet.name;
             document.getElementById('pet-age').textContent = gameState.pet.age;
             
-            updatePetStatus();
+            // Настроение
+            updateMoodDisplay();
+            
+            // Кнопка уборки
+            const cleanPoopBtn = document.getElementById('clean-poop-btn');
+            cleanPoopBtn.disabled = gameState.poops.length === 0;
+            cleanPoopBtn.innerHTML = `<i class="fas fa-poop"></i><span>Убрать (${gameState.poops.length})</span>`;
+            
+            // Проверка состояния
+            checkPetCondition();
+            
+            // Сохранение
+            saveGame();
         }
 
-        function showMessage(text) {
-            const messageElement = document.getElementById('message');
-            messageElement.textContent = text;
+        function updateMoodDisplay() {
+            let moodText = 'Счастлив';
+            let moodEmoji = '😊';
+            
+            if (gameState.pet.isSleeping) {
+                moodText = 'Спит';
+                moodEmoji = '😴';
+            } else if (gameState.pet.health < 30) {
+                moodText = 'Болен';
+                moodEmoji = '🤒';
+            } else if (gameState.pet.hunger < 30) {
+                moodText = 'Голоден';
+                moodEmoji = '🍽️';
+            } else if (gameState.pet.happiness < 30) {
+                moodText = 'Грустен';
+                moodEmoji = '😢';
+            } else if (gameState.pet.energy < 30) {
+                moodText = 'Устал';
+                moodEmoji = '😴';
+            } else if (gameState.pet.hygiene < 50) {
+                moodText = 'Грязный';
+                moodEmoji = '🤢';
+            } else if (gameState.pet.happiness > 80) {
+                moodText = 'Очень счастлив';
+                moodEmoji = '😄';
+            }
+            
+            document.getElementById('pet-mood').innerHTML = `${moodEmoji} ${moodText}`;
+            gameState.pet.mood = moodText.toLowerCase();
+        }
+
+        // ============================
+        // АНИМАЦИИ И ДВИЖЕНИЯ
+        // ============================
+        function movePetTo(target) {
+            const petContainer = document.getElementById('pet-container');
+            
+            // Удаляем все анимации
+            petContainer.classList.remove('walking', 'eating', 'drinking', 'playing', 'sleeping', 'cleaning');
+            petBody.classList.remove('eating', 'drinking', 'playing', 'sleeping', 'cleaning');
+            
+            // Определяем позицию
+            let position;
+            switch(target) {
+                case 'food':
+                    position = { left: '25%', bottom: '50px' };
+                    petContainer.classList.add('eating');
+                    petBody.classList.add('eating');
+                    gameState.pet.isEating = true;
+                    setTimeout(() => { gameState.pet.isEating = false; }, 2000);
+                    break;
+                case 'water':
+                    position = { left: '75%', bottom: '50px' };
+                    petContainer.classList.add('drinking');
+                    petBody.classList.add('drinking');
+                    gameState.pet.isDrinking = true;
+                    setTimeout(() => { gameState.pet.isDrinking = false; }, 2000);
+                    break;
+                case 'toilet':
+                    position = { left: '50%', bottom: '50px' };
+                    gameState.pet.isPooping = true;
+                    setTimeout(() => { gameState.pet.isPooping = false; }, 1500);
+                    break;
+                case 'center':
+                    position = { left: '50%', bottom: '50px' };
+                    petContainer.classList.add('walking');
+                    break;
+                default:
+                    position = { left: '50%', bottom: '50px' };
+            }
+            
+            // Анимация движения
+            petContainer.style.transition = 'left 1s ease, bottom 1s ease';
+            petContainer.style.left = position.left;
+            petContainer.style.bottom = position.bottom;
+            
+            gameState.pet.position = target;
+            
+            // Возвращаем ходьбу после движения
+            if (target !== 'food' && target !== 'water') {
+                setTimeout(() => {
+                    if (!gameState.pet.isSleeping && !gameState.pet.isEating && 
+                        !gameState.pet.isDrinking && !gameState.pet.isPlaying) {
+                        petContainer.classList.add('walking');
+                    }
+                }, 1000);
+            }
         }
 
         // ============================
         // ДЕЙСТВИЯ С ПИТОМЦЕМ
         // ============================
-        function feed() {
+        function feedPet() {
             if (gameState.pet.isSleeping) {
-                showMessage('Питомец спит! Разбудите его, чтобы покормить.');
+                showMessage('Питомец спит! Разбудите его.');
                 return;
             }
             
-            const petType = gameState.pet.type;
+            movePetTo('food');
+            
+            const petData = petsData.find(p => p.id === gameState.pet.type);
             let hungerIncrease = 25;
             
-            // Особенность панды - быстрее насыщается
-            if (petType === 'panda') hungerIncrease = 35;
+            // Особенности разных питомцев
+            if (gameState.pet.type === 'hamster') hungerIncrease = 20;
+            if (gameState.pet.type === 'rabbit') hungerIncrease = 30;
             
             gameState.pet.hunger = Math.min(100, gameState.pet.hunger + hungerIncrease);
             gameState.pet.happiness = Math.min(100, gameState.pet.happiness + 5);
-            gameState.pet.health = Math.min(100, gameState.pet.health + 2);
             
-            showMessage('Вкусно! Спасибо за еду! 🍎');
-            updateStatsDisplay();
-            savePet();
+            addEvent(`${gameState.pet.name} поел(а)`);
+            showMessage('Ням-ням! Вкусно! 🍎');
+            
+            // Шанс покакать после еды
+            if (Math.random() < 0.3) {
+                setTimeout(() => makePoop(), 2000);
+            }
+            
+            updateGameDisplay();
         }
 
-        function play() {
+        function waterPet() {
             if (gameState.pet.isSleeping) {
-                showMessage('Питомец спит! Разбудите его, чтобы поиграть.');
+                showMessage('Питомец спит! Разбудите его.');
                 return;
             }
             
-            if (gameState.pet.energy < 10) {
-                showMessage('Питомец слишком устал, чтобы играть.');
+            movePetTo('water');
+            
+            gameState.pet.energy = Math.min(100, gameState.pet.energy + 10);
+            gameState.pet.health = Math.min(100, gameState.pet.health + 5);
+            
+            addEvent(`${gameState.pet.name} попил(а) воды`);
+            showMessage('Спасибо за воду! 💧');
+            
+            updateGameDisplay();
+        }
+
+        function playWithPet() {
+            if (gameState.pet.isSleeping) {
+                showMessage('Питомец спит! Разбудите его.');
                 return;
             }
             
-            const petType = gameState.pet.type;
+            if (gameState.pet.energy < 15) {
+                showMessage('Питомец слишком устал для игр.');
+                return;
+            }
+            
+            const petContainer = document.getElementById('pet-container');
+            petContainer.classList.remove('walking');
+            petContainer.classList.add('playing');
+            petBody.classList.add('playing');
+            
+            gameState.pet.isPlaying = true;
+            
             let happinessIncrease = 20;
             let energyDecrease = 15;
             
-            // Особенности разных питомцев
-            if (petType === 'dog') happinessIncrease = 25; // Собаки больше любят играть
-            if (petType === 'dragon') energyDecrease = 10; // Драконы медленнее теряют энергию
+            // Особенности
+            if (gameState.pet.type === 'dog') happinessIncrease = 25;
+            if (gameState.pet.type === 'fox') happinessIncrease = 22;
             
             gameState.pet.happiness = Math.min(100, gameState.pet.happiness + happinessIncrease);
             gameState.pet.energy = Math.max(0, gameState.pet.energy - energyDecrease);
-            gameState.pet.hunger = Math.max(0, gameState.pet.hunger - 5);
+            gameState.pet.hunger = Math.max(0, gameState.pet.hunger - 8);
             
+            addEvent(`Вы поиграли с ${gameState.pet.name}`);
             showMessage('Ура! Играть так весело! 🎮');
-            updateStatsDisplay();
-            savePet();
+            
+            // Завершение анимации игры
+            setTimeout(() => {
+                petContainer.classList.remove('playing');
+                petBody.classList.remove('playing');
+                gameState.pet.isPlaying = false;
+                petContainer.classList.add('walking');
+            }, 3000);
+            
+            updateGameDisplay();
         }
 
         function toggleSleep() {
-            gameState.pet.isSleeping = !gameState.pet.isSleeping;
+            const petContainer = document.getElementById('pet-container');
             const sleepBtn = document.getElementById('sleep-btn');
             
+            gameState.pet.isSleeping = !gameState.pet.isSleeping;
+            
             if (gameState.pet.isSleeping) {
+                // Засыпание
+                petContainer.classList.remove('walking', 'playing');
+                petContainer.classList.add('sleeping');
+                petBody.classList.add('sleeping');
+                
                 sleepBtn.innerHTML = '<i class="fas fa-sun"></i><span>Разбудить</span>';
                 
                 let energyIncrease = 30;
                 let healthIncrease = 10;
                 
-                // Особенность собаки - быстрее восстанавливает энергию во сне
-                if (gameState.pet.type === 'dog') energyIncrease = 40;
+                if (gameState.pet.type === 'cat') energyIncrease = 35;
                 
                 gameState.pet.energy = Math.min(100, gameState.pet.energy + energyIncrease);
                 gameState.pet.health = Math.min(100, gameState.pet.health + healthIncrease);
                 
-                showMessage('Хорошо сплю... хррр... 💤');
+                addEvent(`${gameState.pet.name} уснул(а)`);
+                showMessage('Хрррр... Спит сладко... 💤');
             } else {
-                sleepBtn.innerHTML = '<i class="fas fa-bed"></i><span>Уложить спать</span>';
-                showMessage('Я проснулся и полон сил! 🌅');
+                // Пробуждение
+                petContainer.classList.remove('sleeping');
+                petBody.classList.remove('sleeping');
+                petContainer.classList.add('walking');
+                
+                sleepBtn.innerHTML = '<i class="fas fa-bed"></i><span>Спать</span>';
+                showMessage('Я проснулся! Полон сил! 🌅');
             }
             
-            updateStatsDisplay();
-            savePet();
+            updateGameDisplay();
         }
 
-        function heal() {
+        function cleanPet() {
             if (gameState.pet.isSleeping) {
-                showMessage('Питомец спит! Разбудите его, чтобы подлечить.');
+                showMessage('Питомец спит! Разбудите его.');
                 return;
             }
             
-            let healthIncrease = 30;
+            const petContainer = document.getElementById('pet-container');
+            petContainer.classList.remove('walking');
+            petContainer.classList.add('cleaning');
+            petBody.classList.add('cleaning');
             
-            // Особенность кролика - быстрее восстанавливает здоровье
-            if (gameState.pet.type === 'rabbit') healthIncrease = 40;
-            
-            gameState.pet.health = Math.min(100, gameState.pet.health + healthIncrease);
+            gameState.pet.isCleaning = true;
+            gameState.pet.hygiene = 100;
             gameState.pet.happiness = Math.min(100, gameState.pet.happiness + 10);
             
-            showMessage('Спасибо, что заботишься о моем здоровье! 💊');
-            updateStatsDisplay();
-            savePet();
-        }
-
-        function clean() {
-            if (gameState.pet.isSleeping) {
-                showMessage('Питомец спит! Разбудите его, чтобы помыть.');
-                return;
-            }
-            
-            gameState.pet.happiness = Math.min(100, gameState.pet.happiness + 15);
-            gameState.pet.health = Math.min(100, gameState.pet.health + 5);
-            
+            addEvent(`Вы помыли ${gameState.pet.name}`);
             showMessage('Чистота - залог здоровья! 🛁');
-            updateStatsDisplay();
-            savePet();
+            
+            // Завершение анимации мытья
+            setTimeout(() => {
+                petContainer.classList.remove('cleaning');
+                petBody.classList.remove('cleaning');
+                gameState.pet.isCleaning = false;
+                petContainer.classList.add('walking');
+            }, 2000);
+            
+            updateGameDisplay();
         }
 
-        function train() {
+        function healPet() {
             if (gameState.pet.isSleeping) {
-                showMessage('Питомец спит! Разбудите его, чтобы тренировать.');
+                showMessage('Питомец спит! Разбудите его.');
                 return;
             }
             
-            if (gameState.pet.energy < 20) {
-                showMessage('Недостаточно энергии для тренировки.');
-                return;
-            }
-            
-            gameState.pet.energy = Math.max(0, gameState.pet.energy - 20);
-            gameState.pet.hunger = Math.max(0, gameState.pet.hunger - 10);
+            gameState.pet.health = Math.min(100, gameState.pet.health + 30);
             gameState.pet.happiness = Math.min(100, gameState.pet.happiness + 5);
-            gameState.pet.health = Math.min(100, gameState.pet.health + 3);
             
-            showMessage('Я становлюсь сильнее! 💪');
-            updateStatsDisplay();
-            savePet();
+            addEvent(`Вы подлечили ${gameState.pet.name}`);
+            showMessage('Спасибо, что заботишься о моем здоровье! 💊');
+            
+            updateGameDisplay();
+        }
+
+        function useToilet() {
+            if (gameState.pet.isSleeping) {
+                showMessage('Питомец спит! Разбудите его.');
+                return;
+            }
+            
+            movePetTo('toilet');
+            
+            // Шанс успешного использования туалета
+            if (Math.random() < 0.7) {
+                setTimeout(() => {
+                    showMessage('Успешно сходил в туалет! ✅');
+                    gameState.pet.hygiene = Math.min(100, gameState.pet.hygiene + 10);
+                    gameState.pet.happiness = Math.min(100, gameState.pet.happiness + 5);
+                    updateGameDisplay();
+                }, 1500);
+            } else {
+                // Не успел - сделал лужу
+                setTimeout(() => {
+                    showMessage('Ой... Не успел до туалета... 💩');
+                    makePoop();
+                }, 1500);
+            }
         }
 
         // ============================
-        // СИСТЕМА СОХРАНЕНИЯ
+        // СИСТЕМА КАКАШЕК
         // ============================
-        function savePet() {
+        function makePoop() {
+            const now = Date.now();
+            if (now - gameState.lastPoopTime < 30000) return; // Не чаще чем раз в 30 сек
+            
+            gameState.lastPoopTime = now;
+            
+            // Случайная позиция на сцене
+            const x = Math.random() * 70 + 15; // 15-85%
+            const y = Math.random() * 30 + 10; // 10-40%
+            
+            const poop = {
+                id: Date.now(),
+                x: x,
+                y: y,
+                createdAt: now
+            };
+            
+            gameState.poops.push(poop);
+            
+            // Создание элемента какашки
+            const poopElement = document.createElement('div');
+            poopElement.className = 'poop scene-object';
+            poopElement.dataset.id = poop.id;
+            poopElement.innerHTML = '💩';
+            poopElement.style.left = `${poop.x}%`;
+            poopElement.style.bottom = `${poop.y}%`;
+            
+            sceneArea.appendChild(poopElement);
+            
+            // Ухудшение гигиены
+            gameState.pet.hygiene = Math.max(0, gameState.pet.hygiene - 15);
+            
+            addEvent(`${gameState.pet.name} наделал(а) кучку`);
+            showMessage('Ой, какая неприятность! 💩');
+            
+            updateGameDisplay();
+        }
+
+        function cleanPoop() {
+            if (gameState.poops.length === 0) return;
+            
+            // Удаляем все какашки
+            gameState.poops = [];
+            document.querySelectorAll('.poop').forEach(poop => poop.remove());
+            
+            // Улучшение настроения и чистоты
+            gameState.pet.happiness = Math.min(100, gameState.pet.happiness + 10);
+            gameState.pet.hygiene = Math.min(100, gameState.pet.hygiene + 5);
+            
+            addEvent('Вы убрали все какашки');
+            showMessage('Спасибо за уборку! Теперь чисто! 🧹');
+            
+            updateGameDisplay();
+        }
+
+        // ============================
+        // СИСТЕМА УХУДШЕНИЯ
+        // ============================
+        function degradeStats() {
+            if (gameState.pet.type === '') return;
+            
+            const petData = petsData.find(p => p.id === gameState.pet.type);
+            
+            // Базовые скорости ухудшения
+            let hungerRate = 0.4;
+            let happinessRate = 0.3;
+            let energyRate = 0.5;
+            let hygieneRate = 0.2;
+            
+            // Учет особенностей питомца
+            hungerRate *= petData.hungerRate;
+            
+            // Спящий питомец меньше теряет
+            if (gameState.pet.isSleeping) {
+                hungerRate *= 0.3;
+                happinessRate *= 0.2;
+                energyRate = -1; // Восстанавливает энергию
+            }
+            
+            // Обновление показателей
+            gameState.pet.hunger = Math.max(0, gameState.pet.hunger - hungerRate);
+            gameState.pet.happiness = Math.max(0, gameState.pet.happiness - happinessRate);
+            gameState.pet.energy = Math.max(0, Math.min(100, gameState.pet.energy - energyRate));
+            gameState.pet.hygiene = Math.max(0, gameState.pet.hygiene - hygieneRate);
+            
+            // Автоматические действия питомца
+            if (!gameState.pet.isSleeping) {
+                // Автоматическое создание какашек
+                if (Math.random() < 0.002 && gameState.poops.length < 5) {
+                    makePoop();
+                }
+                
+                // Автоматическое умывание (особенно у кота)
+                if (gameState.pet.type === 'cat' && Math.random() < 0.005 && gameState.pet.hygiene < 90) {
+                    gameState.pet.hygiene = Math.min(100, gameState.pet.hygiene + 5);
+                    addEvent(`${gameState.pet.name} умылся(ась)`);
+                }
+            }
+            
+            // Возраст увеличивается
+            if (Math.random() < 0.001) {
+                gameState.pet.age += 1;
+                if (gameState.pet.age % 10 === 0) {
+                    addEvent(`С днем рождения! ${gameState.pet.name} исполнилось ${gameState.pet.age} дней!`);
+                }
+            }
+            
+            updateGameDisplay();
+        }
+
+        // ============================
+        // ПРОВЕРКА СОСТОЯНИЯ
+        // ============================
+        function checkPetCondition() {
+            // Критически низкие показатели
+            if (gameState.pet.health < 20) {
+                showMessage('⚠️ Питомец серьезно болен! Срочно к врачу!');
+                petBody.style.animation = 'shake 0.5s infinite';
+            } else {
+                petBody.style.animation = '';
+            }
+            
+            if (gameState.pet.hunger < 20) {
+                showMessage('🍽️ Питомец голодает! Покормите его!');
+            }
+            
+            if (gameState.pet.hygiene < 30) {
+                showMessage('🤢 Питомец очень грязный! Помойте его!');
+            }
+            
+            // Здоровье ухудшается при плохих условиях
+            if (gameState.pet.hunger < 30 || gameState.pet.hygiene < 30) {
+                gameState.pet.health = Math.max(0, gameState.pet.health - 0.3);
+            }
+        }
+
+        // ============================
+        // СООБЩЕНИЯ И СОБЫТИЯ
+        // ============================
+        function showMessage(text) {
+            messageElement.textContent = text;
+            messageElement.style.animation = 'none';
+            setTimeout(() => {
+                messageElement.style.animation = 'fadeIn 0.3s';
+            }, 10);
+        }
+
+        function addEvent(text) {
+            const now = new Date();
+            const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const eventItem = document.createElement('div');
+            eventItem.className = 'event-item';
+            eventItem.textContent = `[${time}] ${text}`;
+            
+            eventsLog.prepend(eventItem);
+            gameState.messages.unshift(`[${time}] ${text}`);
+            
+            // Ограничение количества сообщений
+            if (eventsLog.children.length > 10) {
+                eventsLog.removeChild(eventsLog.lastChild);
+            }
+        }
+
+        // ============================
+        // СОХРАНЕНИЕ И ЗАГРУЗКА
+        // ============================
+        function saveGame() {
             const saveData = {
                 type: gameState.pet.type,
                 pet: gameState.pet,
+                poops: gameState.poops,
+                messages: gameState.messages.slice(0, 10),
                 lastUpdate: Date.now()
             };
-            localStorage.setItem('tamagotchi_pet', JSON.stringify(saveData));
+            localStorage.setItem('tamagotchi_live', JSON.stringify(saveData));
         }
 
-        function loadPet() {
-            const saved = localStorage.getItem('tamagotchi_pet');
+        function loadGame() {
+            const saved = localStorage.getItem('tamagotchi_live');
             if (saved) {
                 const saveData = JSON.parse(saved);
                 
-                // Если сохранен тот же тип питомца, загружаем его
+                // Загружаем только если тот же питомец
                 if (saveData.type === gameState.pet.type) {
-                    // Рассчитываем, сколько времени прошло
                     const timePassed = Date.now() - saveData.lastUpdate;
                     const minutesPassed = Math.floor(timePassed / (1000 * 60));
                     
-                    // Копируем сохраненные данные
                     gameState.pet = {...saveData.pet};
+                    gameState.poops = saveData.poops || [];
+                    gameState.messages = saveData.messages || [];
                     
-                    // Уменьшаем показатели в зависимости от прошедшего времени
+                    // Ухудшение за прошедшее время
                     if (minutesPassed > 0) {
-                        let hungerDecrease = 0.5;
-                        let happinessDecrease = 0.3;
-                        let energyDecrease = 0.4;
+                        const petData = petsData.find(p => p.id === gameState.pet.type);
+                        const degradeMinutes = Math.min(minutesPassed, 180); // Макс 3 часа
                         
-                        // Особенность единорога - все показатели снижаются медленнее
-                        if (gameState.pet.type === 'unicorn') {
-                            hungerDecrease = 0.3;
-                            happinessDecrease = 0.2;
-                            energyDecrease = 0.3;
+                        gameState.pet.hunger = Math.max(0, gameState.pet.hunger - degradeMinutes * 0.3 * petData.hungerRate);
+                        gameState.pet.happiness = Math.max(0, gameState.pet.happiness - degradeMinutes * 0.2);
+                        gameState.pet.energy = Math.max(0, gameState.pet.energy - degradeMinutes * 0.4);
+                        gameState.pet.hygiene = Math.max(0, gameState.pet.hygiene - degradeMinutes * 0.1);
+                        
+                        // Какашки за прошедшее время
+                        const additionalPoops = Math.floor(minutesPassed / 30); // Каждые 30 минут
+                        for (let i = 0; i < Math.min(additionalPoops, 5); i++) {
+                            setTimeout(() => makePoop(), i * 1000);
                         }
-                        
-                        // Особенность кота - медленнее теряет счастье
-                        if (gameState.pet.type === 'cat') {
-                            happinessDecrease = 0.2;
-                        }
-                        
-                        gameState.pet.hunger = Math.max(0, gameState.pet.hunger - minutesPassed * hungerDecrease);
-                        gameState.pet.happiness = Math.max(0, gameState.pet.happiness - minutesPassed * happinessDecrease);
-                        gameState.pet.energy = Math.max(0, gameState.pet.energy - minutesPassed * energyDecrease);
-                        
-                        // Здоровье ухудшается, если другие показатели низкие
-                        if (gameState.pet.hunger < 30 || gameState.pet.happiness < 30 || gameState.pet.energy < 30) {
-                            gameState.pet.health = Math.max(0, gameState.pet.health - minutesPassed * 0.2);
-                        }
-                        
-                        // Возраст увеличивается каждые 60 минут
-                        gameState.pet.age += Math.floor(minutesPassed / 60);
                     }
                     
+                    // Восстановление лога событий
+                    eventsLog.innerHTML = '';
+                    gameState.messages.forEach(msg => {
+                        const eventItem = document.createElement('div');
+                        eventItem.className = 'event-item';
+                        eventItem.textContent = msg;
+                        eventsLog.appendChild(eventItem);
+                    });
+                    
                     showMessage('С возвращением! Ваш питомец соскучился.');
+                    addEvent('Вы вернулись в игру');
                 }
             }
         }
 
         // ============================
-        // СИСТЕМА УХУДШЕНИЯ ПОКАЗАТЕЛЕЙ
-        // ============================
-        function degradeStats() {
-            if (!gameState.pet.isSleeping) {
-                const petType = gameState.pet.type;
-                
-                let hungerDecrease = 0.5;
-                let happinessDecrease = 0.3;
-                let energyDecrease = 0.4;
-                
-                // Особенности разных питомцев
-                if (petType === 'unicorn') {
-                    hungerDecrease = 0.3;
-                    happinessDecrease = 0.2;
-                    energyDecrease = 0.3;
-                }
-                if (petType === 'cat') {
-                    happinessDecrease = 0.2;
-                }
-                if (petType === 'dragon') {
-                    energyDecrease = 0.3;
-                }
-                
-                gameState.pet.hunger = Math.max(0, gameState.pet.hunger - hungerDecrease);
-                gameState.pet.happiness = Math.max(0, gameState.pet.happiness - happinessDecrease);
-                gameState.pet.energy = Math.max(0, gameState.pet.energy - energyDecrease);
-                
-                // Здоровье ухудшается, если другие показатели слишком низкие
-                if (gameState.pet.hunger < 30 || gameState.pet.happiness < 30 || gameState.pet.energy < 30) {
-                    gameState.pet.health = Math.max(0, gameState.pet.health - 0.5);
-                }
-                
-                // Возраст увеличивается медленно
-                if (Math.random() < 0.001) {
-                    gameState.pet.age += 1;
-                }
-                
-                updateStatsDisplay();
-                savePet();
-                
-                // Показываем предупреждения
-                if (gameState.pet.hunger < 30) {
-                    if (Math.random() < 0.1) showMessage('Я голоден... 🍽️');
-                } else if (gameState.pet.happiness < 30) {
-                    if (Math.random() < 0.1) showMessage('Мне скучно... 😞');
-                } else if (gameState.pet.energy < 30) {
-                    if (Math.random() < 0.1) showMessage('Я устал... 😴');
-                } else if (gameState.pet.health < 30) {
-                    if (Math.random() < 0.1) showMessage('Я плохо себя чувствую... 🤒');
-                }
-            } else {
-                // Во сне питомец восстанавливается
-                let energyIncrease = 1;
-                let healthIncrease = 0.5;
-                
-                if (gameState.pet.type === 'dog') energyIncrease = 1.5;
-                if (gameState.pet.type === 'rabbit') healthIncrease = 0.8;
-                
-                gameState.pet.energy = Math.min(100, gameState.pet.energy + energyIncrease);
-                gameState.pet.health = Math.min(100, gameState.pet.health + healthIncrease);
-                
-                updateStatsDisplay();
-                savePet();
-            }
-        }
-
-        // ============================
-        // ПРОВЕРКА ДОСТУПНОСТИ КНОПОК
-        // ============================
-        function checkButtons() {
-            const playBtn = document.getElementById('play-btn');
-            const trainBtn = document.getElementById('train-btn');
-            const healBtn = document.getElementById('heal-btn');
-            
-            playBtn.disabled = gameState.pet.isSleeping || gameState.pet.energy < 10;
-            trainBtn.disabled = gameState.pet.isSleeping || gameState.pet.energy < 20;
-            healBtn.disabled = gameState.pet.isSleeping || gameState.pet.health >= 100;
-        }
-
-        // ============================
-        // ВОЗВРАТ К ВЫБОРУ ПИТОМЦА
+        // ВОЗВРАТ К ВЫБОРУ
         // ============================
         function goBackToSelection() {
             if (confirm('Вернуться к выбору питомца? Текущий питомец будет сохранен.')) {
+                saveGame();
+                
                 gameScreen.style.display = 'none';
                 selectionScreen.style.display = 'block';
+                
                 gameState.selectedPet = null;
                 startButton.disabled = true;
-                startButton.textContent = 'Начать игру';
+                startButton.innerHTML = '<i class="fas fa-play-circle"></i> Начать заботу';
                 
-                // Снимаем выделение с питомцев
                 document.querySelectorAll('.pet-option').forEach(el => {
                     el.classList.remove('selected');
                 });
@@ -1003,37 +1462,61 @@
         }
 
         // ============================
-        // ИНИЦИАЛИЗАЦИЯ
+        // ИНИЦИАЛИЗАЦИЯ ИГРЫ
         // ============================
-        function init() {
-            renderPetSelection();
+        function initGame() {
+            // Инициализация выбора питомца
+            initPetSelection();
             
-            // Кнопка начала игры
+            // Обработчики кнопок выбора
             startButton.addEventListener('click', startGame);
-            
-            // Кнопка возврата
             backButton.addEventListener('click', goBackToSelection);
             
-            // Кнопки действий
-            document.getElementById('feed-btn').addEventListener('click', feed);
-            document.getElementById('play-btn').addEventListener('click', play);
+            // Обработчики действий
+            document.getElementById('feed-btn').addEventListener('click', feedPet);
+            document.getElementById('water-btn').addEventListener('click', waterPet);
+            document.getElementById('play-btn').addEventListener('click', playWithPet);
             document.getElementById('sleep-btn').addEventListener('click', toggleSleep);
-            document.getElementById('heal-btn').addEventListener('click', heal);
-            document.getElementById('clean-btn').addEventListener('click', clean);
-            document.getElementById('train-btn').addEventListener('click', train);
+            document.getElementById('clean-btn').addEventListener('click', cleanPet);
+            document.getElementById('heal-btn').addEventListener('click', healPet);
+            document.getElementById('toilet-btn').addEventListener('click', useToilet);
+            document.getElementById('clean-poop-btn').addEventListener('click', cleanPoop);
             
-            // Запускаем систему ухудшения показателей
+            // Система ухудшения показателей
             setInterval(degradeStats, 30000); // Каждые 30 секунд
             
-            // Проверяем доступность кнопок
-            setInterval(checkButtons, 5000); // Каждые 5 секунд
+            // Автоматические движения
+            setInterval(() => {
+                if (!gameState.pet.isSleeping && !gameState.pet.isEating && 
+                    !gameState.pet.isDrinking && !gameState.pet.isPlaying &&
+                    !gameState.pet.isCleaning && Math.random() < 0.3) {
+                    
+                    const positions = ['center', 'food', 'water', 'toilet'];
+                    const randomPos = positions[Math.floor(Math.random() * positions.length)];
+                    movePetTo(randomPos);
+                }
+            }, 10000);
             
-            // Сохраняем при закрытии
-            window.addEventListener('beforeunload', savePet);
+            // Автоматические сообщения
+            setInterval(() => {
+                if (!gameState.pet.isSleeping && Math.random() < 0.2) {
+                    const messages = [
+                        'Поиграй со мной!',
+                        'Хочу кушать!',
+                        'Может, погуляем?',
+                        'Я скучаю по тебе!',
+                        'Время для игр!'
+                    ];
+                    showMessage(messages[Math.floor(Math.random() * messages.length)]);
+                }
+            }, 15000);
+            
+            // Сохранение при закрытии
+            window.addEventListener('beforeunload', saveGame);
         }
 
-        // Запускаем игру
-        window.addEventListener('DOMContentLoaded', init);
+        // Запуск игры
+        window.addEventListener('DOMContentLoaded', initGame);
     </script>
 </body>
 </html>
